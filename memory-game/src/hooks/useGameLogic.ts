@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Card {
   id: number;
@@ -7,21 +7,54 @@ interface Card {
 }
 
 export const useGameLogic = () => {
-  const [cards, setCards] = useState<Card[]>([
-    { id: 1, image: '/assets/images/1.jpeg', isFlipped: false },
-    { id: 2, image: '/assets/images/2.jpeg', isFlipped: false },
-    { id: 3, image: '/assets/images/3.jpeg', isFlipped: false },
-    { id: 4, image: '/assets/images/4.jpeg', isFlipped: false },
-    { id: 5, image: '/assets/images/5.jpeg', isFlipped: false },
-    { id: 6, image: '/assets/images/6.jpeg', isFlipped: false },
-    // Daha fazla kart ekleyebilirsiniz
-  ]);
+  const [cards, setCards] = useState<Card[]>([]);
+  const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
+  const [matchedPairs, setMatchedPairs] = useState<Set<string>>(new Set());
 
-  const handleCardClick = (id: number) => {
-    setCards(cards.map(card =>
-      card.id === id ? { ...card, isFlipped: !card.isFlipped } : card
-    ));
+  useEffect(() => {
+    // Kartları oluştur ve karıştır
+    const baseCards = Array.from({ length: 6 }, (_, i) => [
+      { id: i * 2, image: `/assets/images/${i + 1}.jpeg`, isFlipped: false },
+      { id: i * 2 + 1, image: `/assets/images/${i + 1}.jpeg`, isFlipped: false },
+    ]);
+    const newCards = baseCards.reduce((acc, val) => acc.concat(val), []);
+    setCards(shuffleArray(newCards));
+  }, []);
+
+  const shuffleArray = (array: Card[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   };
 
-  return { cards, handleCardClick };
+  useEffect(() => {
+    if (flippedIndices.length === 2) {
+      const [firstIndex, secondIndex] = flippedIndices;
+      if (cards[firstIndex].image === cards[secondIndex].image) {
+        setMatchedPairs(prev => new Set(prev).add(cards[firstIndex].image));
+      } else {
+        setTimeout(() => {
+          setCards(cards.map((card, index) =>
+            index === firstIndex || index === secondIndex ? { ...card, isFlipped: false } : card
+          ));
+        }, 1000);
+      }
+      setFlippedIndices([]);
+    }
+  }, [flippedIndices, cards]);
+
+  const handleCardClick = (index: number) => {
+    if (flippedIndices.length === 2 || cards[index].isFlipped) return;
+
+    setCards(cards.map((card, i) =>
+      i === index ? { ...card, isFlipped: true } : card
+    ));
+    setFlippedIndices([...flippedIndices, index]);
+  };
+
+  const allCardsMatched = cards.every(card => matchedPairs.has(card.image));
+
+  return { cards, handleCardClick, allCardsMatched };
 };
