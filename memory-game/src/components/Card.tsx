@@ -4,7 +4,7 @@ interface CardProps {
   id: number;
   image: string;
   isFlipped: boolean;
-  onClick: (id: number) => void;
+  onClick: (index: number) => void;
 }
 
 const Card: React.FC<CardProps> = ({ id, image, isFlipped, onClick }) => {
