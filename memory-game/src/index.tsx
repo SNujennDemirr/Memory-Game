@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import './assets/styles/index.css';
+import './styles/index.css'; // updated path
 
 ReactDOM.render(<App />, document.getElementById('root'));

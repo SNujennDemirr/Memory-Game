@@ -3,20 +3,19 @@ import Card from './Card';
 import { useGameLogic } from '../hooks/useGameLogic';
 
 const Board: React.FC = () => {
-  const { cards, handleCardClick, allCardsMatched } = useGameLogic();
+  const { cards, handleCardClick } = useGameLogic();
 
   return (
     <div className="board">
-      {cards.map((card, index) => (
+      {cards.map(card => (
         <Card
           key={card.id}
-          id={index}
+          id={card.id}
           image={card.image}
           isFlipped={card.isFlipped}
           onClick={handleCardClick}
         />
       ))}
-      {allCardsMatched && <div className="message">Tebrikler! Tüm kartları eşleştirdiniz!</div>}
     </div>
   );
 };

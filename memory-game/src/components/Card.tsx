@@ -4,7 +4,7 @@ interface CardProps {
   id: number;
   image: string;
   isFlipped: boolean;
-  onClick: (index: number) => void;
+  onClick: (id: number) => void;
 }
 
 const Card: React.FC<CardProps> = ({ id, image, isFlipped, onClick }) => {
@@ -13,9 +13,14 @@ const Card: React.FC<CardProps> = ({ id, image, isFlipped, onClick }) => {
       className={`card ${isFlipped ? 'flipped' : ''}`}
       onClick={() => onClick(id)}
     >
-      {isFlipped ? <img src={image} alt="card" /> : <div className="card-back" />}
+      <div className="card-inner">
+        <div className="card-front"></div>
+        <div className="card-back">
+          {isFlipped && <img src={image} alt="card" />}
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default Card;
